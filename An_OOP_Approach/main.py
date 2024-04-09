@@ -1,4 +1,4 @@
-from fastapi import Body, Path, FastAPI
+from fastapi import FastAPI, Body, Path, Query
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -81,7 +81,7 @@ async def read_certain_book_by_id(book_id: int = Path(gt= 0)):
 # Get Request with dynamic url to fetch books by certain ratings --------------------
 
 @app.get("/Books/rating/{Book_rating}")
-async def read_certain_book_by_rating(book_rating: int):
+async def read_certain_book_by_rating(book_rating: int = Path(gt= 0, lt= 6)):
     RETURN_BOOKS = []
     for book in BOOKS:
         if book.rating == book_rating:
@@ -93,8 +93,8 @@ async def read_certain_book_by_rating(book_rating: int):
     
 # Get Request with dynamic url to fetch books by Published Year --------------------
 
-@app.get("/Books/published_date/{book_published_year}")
-async def read_books_by_published_date(book_published_year: int):
+@app.get("/Books/published_date")
+async def read_books_by_published_date(book_published_year: int = Query(min_length= 4)):
     RETURN_BOOKS = []
     for book in BOOKS:
         if book.published_date == book_published_year:
