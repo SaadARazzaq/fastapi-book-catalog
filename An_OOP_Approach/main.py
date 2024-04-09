@@ -1,6 +1,10 @@
-from fastapi import FastAPI, Body, Path, Query
+from fastapi import FastAPI, Body, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
+
+# Note: Some Important things to know:
+# Validation for query parameters is applied to: "/Books/Published_Date"
+# Validation for path parameters is applied to: "/Books/Certain_book/{id}"
 
 app = FastAPI()
 
@@ -29,7 +33,7 @@ class BookRequest(BaseModel):
     title: str = Field(min_length = 3)
     author: str = Field(min_length= 1)
     category: str = Field(min_length = 3)
-    published_date: int = Field(min_length= 4)
+    published_date: int = Field(gt=999)
     price: int = Field(gt=1)
     quantity: int = Field(gt=0)
     rating: int = Field(gt=0, le=5)
@@ -64,43 +68,45 @@ BOOKS = [
 @app.get("/Books")
 async def read_all_books():
     if len(BOOKS) == 0:
-        return { "Message" : "No Books found in the system " }
+        # return { "Message" : "No Books found in the system " }
+        raise HTTPException(status_code=404, detail='Item Not Found')
     else:
         return BOOKS
     
 # Get Request with dynamic url to fetch only single book --------------------
 
-@app.get("/Books/id/{Book_id}")
+@app.get("/Books/{Book_id}")
 async def read_certain_book_by_id(book_id: int = Path(gt= 0)):
     for book in BOOKS:
         if book.id == book_id:
             return book
         else:
-            return { "Message" : "No Books found in the system " }
+            # return { "Message" : "No Books found in the system " }
+            raise HTTPException(status_code=404, detail='Item Not Found')
         
 # Get Request with dynamic url to fetch books by certain ratings --------------------
 
-@app.get("/Books/rating/{Book_rating}")
-async def read_certain_book_by_rating(book_rating: int = Path(gt= 0, lt= 6)):
+@app.get("/Books/rating")
+async def read_certain_book_by_rating(book_rating: int = Query(gt= 0, lt= 6)):
     RETURN_BOOKS = []
     for book in BOOKS:
         if book.rating == book_rating:
             RETURN_BOOKS.append(book)
-    if len(RETURN_BOOKS) == 0:
-        return { "Message" : "No Books found in the system " }
-    else:
-        return RETURN_BOOKS
+    if not RETURN_BOOKS:
+        raise HTTPException(status_code=404, detail='No books found for the given rating')
+    return RETURN_BOOKS
     
 # Get Request with dynamic url to fetch books by Published Year --------------------
 
 @app.get("/Books/published_date")
-async def read_books_by_published_date(book_published_year: int = Query(min_length= 4)):
+async def read_books_by_published_date(book_published_year: int = Query(gt= 999)):
     RETURN_BOOKS = []
     for book in BOOKS:
         if book.published_date == book_published_year:
             RETURN_BOOKS.append(book)
     if len(RETURN_BOOKS) == 0:
-        return { "Message" : "No Books found in the system " }
+        # return { "Message" : "No Books found in the system " }
+        raise HTTPException(status_code=404, detail='Item Not Found')
     else:
         return RETURN_BOOKS
 
@@ -119,9 +125,14 @@ def get_book_id(book: Book):
 
 @app.put("/Books/update_book")
 async def update_book(book: BookRequest):
+    flag = 0
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book.id:
+            flag = 1
             BOOKS[i] = book
+    if flag == 0:
+        # return { "Message" : "No Books found to Delete " }
+        raise HTTPException(status_code=404, detail='Item Not Found')
 
 # Delete Request --------------------
 
@@ -134,9 +145,6 @@ async def delete_book(book_id: int = Path(gt= 0)):
             BOOKS.pop(i)
             break
     if flag == 0:
-        return { "Message" : "No Books found to Delete " }
+        # return { "Message" : "No Books found to Delete " }
+        raise HTTPException(status_code=404, detail='Item Not Found')
     
-
-# Note: Some Important things to know:
-# Validation for query parameters is applied to: "/Books/Published_Date"
-# Validation for path parameters is applied to: "/Books/Certain_book/{id}"
