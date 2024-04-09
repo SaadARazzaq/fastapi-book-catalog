@@ -29,8 +29,20 @@ class BookRequest(BaseModel):
     category: str = Field(min_length = 3)
     price: int = Field(gt=1)
     quantity: int = Field(gt=0)
-    rating: int = Field(gt=0, lt=5)
-    
+    rating: int = Field(gt=0, le=5)
+
+    class Config:
+        json_schema_extra = {
+            "example" : {
+                "title" : "Book Title",
+                "author" : "Saad Abdur Razzaq",
+                "category" : "Book Category",
+                "price" : 10,
+                "quantity" : 10,
+                "rating" : 5
+            }
+        }
+
 
 BOOKS = [
     Book(1, "Holy Quran", "Allah Almighty", "Religious", 50, 112, 5),
