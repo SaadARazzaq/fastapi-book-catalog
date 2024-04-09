@@ -1,10 +1,21 @@
 from fastapi import FastAPI, Body, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
+from starlette import status
 
-# Note: Some Important things to know:
+'''
+Note: Some Important things to know:
 # Validation for query parameters is applied to: "/Books/Published_Date"
 # Validation for path parameters is applied to: "/Books/Certain_book/{id}"
+'''
+
+'''
+NOTE: STATUS CODE RESPONSES
+- For GET requests => HTTP_200_OK (Because we are returning something)
+- For POST requests => HTTP_201_CREATED (Because we are creating something and NOT returning)
+- For PUT, DELETE requests => HTTP_204_NO_CONTENT (Because we are NOT creating OR returning something but updating/enhancing our application)
+
+'''
 
 app = FastAPI()
 
@@ -65,7 +76,7 @@ BOOKS = [
 
 # Get Request --------------------
 
-@app.get("/Books")
+@app.get("/Books", status_code=status.HTTP_200_OK)
 async def read_all_books():
     if len(BOOKS) == 0:
         # return { "Message" : "No Books found in the system " }
@@ -75,7 +86,7 @@ async def read_all_books():
     
 # Get Request with dynamic url to fetch only single book --------------------
 
-@app.get("/Books/{Book_id}")
+@app.get("/Books/{Book_id}", status_code=status.HTTP_200_OK)
 async def read_certain_book_by_id(book_id: int = Path(gt= 0)):
     for book in BOOKS:
         if book.id == book_id:
@@ -86,7 +97,7 @@ async def read_certain_book_by_id(book_id: int = Path(gt= 0)):
         
 # Get Request with dynamic url to fetch books by certain ratings --------------------
 
-@app.get("/Books/rating")
+@app.get("/Books/rating", status_code=status.HTTP_200_OK)
 async def read_certain_book_by_rating(book_rating: int = Query(gt= 0, lt= 6)):
     RETURN_BOOKS = []
     for book in BOOKS:
@@ -98,7 +109,7 @@ async def read_certain_book_by_rating(book_rating: int = Query(gt= 0, lt= 6)):
     
 # Get Request with dynamic url to fetch books by Published Year --------------------
 
-@app.get("/Books/published_date")
+@app.get("/Books/published_date", status_code=status.HTTP_200_OK)
 async def read_books_by_published_date(book_published_year: int = Query(gt= 999)):
     RETURN_BOOKS = []
     for book in BOOKS:
@@ -112,7 +123,7 @@ async def read_books_by_published_date(book_published_year: int = Query(gt= 999)
 
 # Post Request --------------------
 
-@app.post("/create_book")
+@app.post("/create_book", status_code=status.HTTP_201_CREATED)
 async def create_book(book_request: BookRequest):
     new_book = Book(**book_request.model_dump())
     BOOKS.append(get_book_id(new_book))
@@ -123,7 +134,7 @@ def get_book_id(book: Book):
 
 # Put Request --------------------
 
-@app.put("/Books/update_book")
+@app.put("/Books/update_book", status_code=status.HTTP_204_NO_CONTENT)
 async def update_book(book: BookRequest):
     flag = 0
     for i in range(len(BOOKS)):
@@ -136,7 +147,7 @@ async def update_book(book: BookRequest):
 
 # Delete Request --------------------
 
-@app.delete("/Books/delete_book/{book_id}")
+@app.delete("/Books/delete_book/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id: int = Path(gt= 0)):
     flag = 0
     for i in range(len(BOOKS)):
