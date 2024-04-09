@@ -135,3 +135,8 @@ async def delete_book(book_id: int = Path(gt= 0)):
             break
     if flag == 0:
         return { "Message" : "No Books found to Delete " }
+    
+
+# Note: Some Important things to know:
+# Validation for query parameters is applied to: "/Books/Published_Date"
+# Validation for path parameters is applied to: "/Books/Certain_book/{id}"
