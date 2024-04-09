@@ -66,7 +66,7 @@ async def read_all_books():
     
 # Get Request with dynamic url to fetch only single book --------------------
 
-@app.get("/Books/{Book_id}")
+@app.get("/Books/id/{Book_id}")
 async def read_certain_book_by_id(book_id: int):
     for book in BOOKS:
         if book.id == book_id:
