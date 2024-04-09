@@ -1,4 +1,4 @@
-from fastapi import Body, FastAPI
+from fastapi import Body, Path, FastAPI
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -71,7 +71,7 @@ async def read_all_books():
 # Get Request with dynamic url to fetch only single book --------------------
 
 @app.get("/Books/id/{Book_id}")
-async def read_certain_book_by_id(book_id: int):
+async def read_certain_book_by_id(book_id: int = Path(gt= 0)):
     for book in BOOKS:
         if book.id == book_id:
             return book
@@ -126,7 +126,7 @@ async def update_book(book: BookRequest):
 # Delete Request --------------------
 
 @app.delete("/Books/delete_book/{book_id}")
-async def delete_book(book_id: int):
+async def delete_book(book_id: int = Path(gt= 0)):
     flag = 0
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book_id:
