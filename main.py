@@ -72,7 +72,7 @@ async def delete_book(book_title: str):
 @app.get('/Books/{author}/')
 async def Fetch_all_books_from_specific_author(Author: str):
     books_from_author = []
-    for book in Books:
+    for book in BOOKS:
         if book.get('Author').casefold() == Author.casefold():
             books_from_author.append(book)
     if len(books_from_author) == 0:
