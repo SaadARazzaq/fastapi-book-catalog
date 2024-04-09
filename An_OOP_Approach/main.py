@@ -67,12 +67,25 @@ async def read_all_books():
 # Get Request with dynamic url to fetch only single book --------------------
 
 @app.get("/Books/{Book_id}")
-async def read_certain_book(book_id: int):
+async def read_certain_book_by_id(book_id: int):
     for book in BOOKS:
         if book.id == book_id:
             return book
         else:
             return { "Message" : "No Books found in the system " }
+        
+# Get Request with dynamic url to fetch books by certain ratings --------------------
+
+@app.get("/Books/rating/{Book_rating}")
+async def read_certain_book_by_rating(book_rating: int):
+    BOOKS_WITH_RATING_X = []
+    for book in BOOKS:
+        if book.rating == book_rating:
+            BOOKS_WITH_RATING_X.append(book)
+    if len(BOOKS_WITH_RATING_X) == 0:
+        return { "Message" : "No Books found in the system " }
+    else:
+        return BOOKS_WITH_RATING_X
 
 # Post Request --------------------
 
