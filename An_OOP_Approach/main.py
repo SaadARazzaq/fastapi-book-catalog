@@ -30,6 +30,7 @@ class BookRequest(BaseModel):
     price: int = Field(gt=1)
     quantity: int = Field(gt=0)
     rating: int = Field(gt=0, lt=5)
+    
 
 BOOKS = [
     Book(1, "Holy Quran", "Allah Almighty", "Religious", 50, 112, 5),
@@ -58,4 +59,8 @@ async def read_all_books():
 @app.post("/create_book")
 async def create_book(book_request: BookRequest):
     new_book = Book(**book_request.model_dump())
-    BOOKS.append(new_book)
+    BOOKS.append(get_book_id(new_book))
+
+def get_book_id(book: Book):
+    book.id = 1 if len(BOOKS) == 0 else BOOKS[-1].id + 1
+    return book
