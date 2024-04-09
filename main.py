@@ -17,7 +17,6 @@ BOOKS = [
 async def read_all_books():
     return BOOKS
 
-
 @app.get("/books/{book_title}")
 async def read_book(book_title: str):
     for book in BOOKS:
