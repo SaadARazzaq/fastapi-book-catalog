@@ -97,3 +97,24 @@ async def create_book(book_request: BookRequest):
 def get_book_id(book: Book):
     book.id = 1 if len(BOOKS) == 0 else BOOKS[-1].id + 1
     return book
+
+# Put Request
+
+@app.put("/Books/update_book")
+async def update_book(book: BookRequest):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book.id:
+            BOOKS[i] = book
+
+# Delete Request
+
+@app.delete("/Books/delete_book/{book_id}")
+async def delete_book(book_id: int):
+    flag = 0
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book_id:
+            flag = 1
+            BOOKS.pop(i)
+            break
+    if flag == 0:
+        return { "Message" : "No Books found to Delete " }
