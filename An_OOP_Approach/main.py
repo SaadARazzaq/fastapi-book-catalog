@@ -56,8 +56,7 @@ BOOKS = [
 ]
 
 # Get Request --------------------
-# Get Request --------------------
-# Get Request --------------------
+
 @app.get("/Books")
 async def read_all_books():
     if len(BOOKS) == 0:
@@ -65,6 +64,15 @@ async def read_all_books():
     else:
         return BOOKS
     
+# Get Request with dynamic url to fetch only single book --------------------
+
+@app.get("/Books/{Book_id}")
+async def read_certain_book(book_id: int):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book
+        else:
+            return { "Message" : "No Books found in the system " }
 
 # Post Request --------------------
 
